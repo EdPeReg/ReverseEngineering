@@ -1,3 +1,5 @@
+https://crackmes.one/crackme/5e4ec05c33c5d4439bb2dbea
+
 Using Guidra to decompile the ejecutable, and looking for the main function,
 you will see a lot of weird code (most of them should be ignored and only focus
 in the most important parts).

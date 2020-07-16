@@ -1,4 +1,8 @@
-/* 2020-07-14 */
+/* 2020-07-14 
+ *
+ *	https://crackmes.one/crackme/5e66aea233c5d4439bb2dde8
+ *
+ * */
 
 #include <iostream>
 #include <string>

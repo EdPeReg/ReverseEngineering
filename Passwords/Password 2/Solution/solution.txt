@@ -1,3 +1,5 @@
+https://crackmes.one/crackme/5eae2d6633c5d47611746500
+
 I used guidra to analize the executable, showing me the decompiled code.
 If you do that you will see a lot of things like:
 
