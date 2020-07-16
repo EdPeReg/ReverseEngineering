@@ -1,0 +1,75 @@
+Using Guidra to decompile the ejecutable, and looking for the main function,
+you will see a lot of weird code (most of them should be ignored and only focus
+in the most important parts).
+
+The program expects to recieve an input, and depending of that input, show
+"Bad password" or "Well played! This is the only valid flag."
+
+At memory 0x00401076 you can see the operator >> is called, this is sign of using
+std::cin, having something like this:
+
+    operator>><char,std--char_traits<char>,std--allocator<char>>
+              ((basic_istream *)__TMC_END__,(basic_string *)str[abi:cxx11]);
+
+The user input is stored in str[abi:cxx11].
+
+At 0x004010be the operator != is called, doing a comparation between "str" and
+"falsePassword", but what's the value of "falsePassword"? 
+
+Searching in the functions, there is a function called "__static_initialization_and_destruction_0"
+this function uses "falsePassword" at 0x00401548:
+
+	basic_string(falsePassword[abi:cxx11],(allocator *)"1d47faf54f84dc393a4a015a8f190e36");
+
+We can see that the value of our falsePassword is the string "1d47faf54f84dc393a4a015a8f190e36"
+
+At 0x00401119 we can see that the user input should be greater than 3.
+Now from this point there is some bunch of if nested using the [] operator.
+After analizing the code the conclusion is this:
+
+userInput[0] == falsePassword[0]
+userInput[1] == falsePassword[5]
+userInput[2] == falsePassword[8]
+userInput[3] == falsePassword[9]
+
+If those conditions are true, we obtain a string like this "1a4f". But THIS IS NOT
+THE PASSWORD, YET. If we use that string, now it won't show "Bad password", but
+also won't show anything. 
+
+After those conditions there are two important points here, at 0x004011bf we see this:
+
+	bVar2 = true;
+
+That assignment is made when the user input is "1a4f".
+
+Also at 0x00401280 we can see that main is returning "bVar2", which is 1 if the
+user input is "1a4f".
+
+	return (ulong)bVar2;
+
+If we continue analazing the assembly code, we can see a function immediately after
+main return is called.
+"_static_initialization_and_destruction", this function is long, it calls
+the main function and uses "str".
+
+At 0x004012a0 we are calling the main function:
+
+	mainVal = main(2,local_70,local_70);
+
+Which should be 1 if user input is "1a4d".
+There are more weird code happening, a bunch of loops and assignments, but at some
+point, we can see that we are using "str" again, so that code can be ignored.
+
+Like in the main function, we are using the [] operator in our "str", obtaining this:
+
+userInput[4] == userInput[1]
+userInput[5] == '@'
+
+Obtaining the string "1a4fa@", at this point you can try and yes! we found the 
+valid flag :) 
+
+There are more things happening at 0x00401477, but we don't care because we 
+obtain the flag already.
+
+The string can be also "1a4fa@jfk8a8vnmdlajjg13gd", but the first 6 characters
+should be "1a4fa@", after this, it doesn't matter.

@@ -1,0 +1,4 @@
+*.gpr
+*.rep
+*.lock
+*.lock~
