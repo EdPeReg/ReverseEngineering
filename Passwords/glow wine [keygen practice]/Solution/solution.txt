@@ -1,0 +1,57 @@
+Using the command line "strings glowwine" we can obtain all the strings from
+the binary, there is a chance where the actuall password is just a simple
+string. 
+
+From all the strings we obtain the most important:
+
+usage: ./glowwine <key>
+nice one! Now, can you keygen me?
+wrong key, try again :/
+
+Here we can see that it needs an argument, which will be the key, also, there
+is not a string representation of our password :(
+
+Using ghidra to dissasembly the binary we can obtain the assembly code
+plus the high level code representation (often with weird names).
+
+After analazing the code, there are three conditions we need to accomplish:
+
+1 - Password length should be 5.
+2 - Second letter should be '@'.
+3 - The sum of their ASCII value from letters 3-5 should be 300.
+
+The program first check if an argument is provided:
+
+        001006d9 83 7d fc 01     CMP        dword ptr [RBP + local_c],0x1 ; if(param < 2)
+        001006dd 7f 16           JG         LAB_001006f5
+        001006e6 e8 95 fe        CALL       puts                          ; "usage: ./glowwine <key>"
+                 ff ff
+
+If an argument was provided, will obtain the length of that argument and checks
+if that length is different from 5, if not, sorrybro() will be called (which only 
+prints wrong key, try again :/)
+
+        00100703 e8 88 fe        CALL       strlen  ; length = strlen(inputIuser);
+                 ff ff
+        00100708 48 83 f8 05     CMP        RAX,0x5 ; if(length != 5)
+        0010070c 74 0a           JZ         LAB_00100718
+
+We check if the second letter is different from @:
+											; 0x40 = 64 = '@'
+        0010072a 3c 40           CMP        AL,0x40 ; if(password[1] != '@')
+        0010072c 74 0a           JZ         LAB_00100738
+
+And finally check if the sum of their ASCII values from the letters 3-5 are different from 300.
+
+											; 0x12c = 300
+        0010077b 3d 2c 01        CMP        EAX,0x12c ; if(password[2] + password[3] + password[4] != 300)
+                 00 00
+        00100780 74 0a           JZ         LAB_0010078c
+
+If all those conditions aren't true, we get a nice "nice one! Now, can you keygen me?", otherwise
+will print sorrybro().
+
+The file keygen.cpp is not efficient, because I'm looping an infinite loop, adding some
+random characters to a string and finally check the conditions to break the loop.
+But can generate N keys at least :) 
+
