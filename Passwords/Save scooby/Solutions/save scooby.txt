@@ -1,0 +1,26 @@
+The idea here, it gets the full path of your current directory (that depends where 
+you are executing the program).
+
+It will change all '/' with '$' and change each character following the next conditions:
+	1. If a lowercase letter is found, take that character and substract 30, this will
+	   convert that character to uppercase but with two values more.
+
+		* h = 104
+		* J = 104 - 30.
+	
+	2. If an uppercase letter is found, convert it to lowercase adding 30.
+		* D = 68
+		* b = 68 + 30
+
+After this you will have a path with the next form: $JQOG$bQEWOGVU
+
+Now will check that each character from the user input matches with a character
+from the path. If it match you got it :).
+
+Example:
+
+Path = /home/Documents
+Path converted = $JQOG$bQEWOGPVU
+
+Valid keys: $, $J, $JQ (Each character should match, $j is invalid).
+		
