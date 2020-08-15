@@ -1,0 +1,40 @@
+https://crackmes.one/crackme/5f05ec3c33c5d42a7c66792b
+
+Using Guidra to analize the code, we can see some interesting points in the
+login() function:
+
+1. We are using malloc, allocating in the heap some blocks of memory.
+   16 bytes for the user password and 8 bytes for the uer's "id".
+
+  password = (char *)malloc(0x10);
+  id = (uint *)malloc(8);
+
+	In a 64 bit-system, the smallest allowed allocation for malloc is 32 bytes (REMEMBER THIS).
+
+2. Now, here is the hint to see that we can overflow the user's password:
+
+  fgets(password,0xa0,stdin);
+
+	We are reading from the standard input a size of 0xa0 (160) and store it in our password, we can read
+	more than 0x10, we can overflow.
+
+3. The user's "id" has a value 1, and our goal is to change it to 0.
+
+How can we do that? Well, we need to input a string of length 31, why 31? because the smallest allowed 
+allocation for malloc is 32 bytes, there are 16 bytes we can use without any problem but other 16 bytes free,
+after those bytes you will find the first block of memory that the user's id have.
+fgets appends the null terminator (remember, its value is 0), we need to insert that null terminator to the 
+first block of memory from from the user's id.
+
+	16 bytes that should be used.                  16 bytes free 						User id bytes.
+----------------------------------- ----------------------------------------------   -------------------
+| 								  | | 											 |   | 				   |
+- - - - - - - - - - - - - - - - - - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -    - - - - - - - - -
+0 1 2 3 4 5 6 7 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31  |0 1 2 3 4 5 6 7 ...
+| 																				 |
+----------------------------------------------------------------------------------
+						32 bytes in total for the user's password
+
+As we can see above, if we enter a string of 31 length, with the null terminator appended will invade
+the next block of memory, changing the value from 1 to 0.
+
