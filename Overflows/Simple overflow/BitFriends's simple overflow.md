@@ -2,7 +2,8 @@
 
 When you run the program, my mission is to get **logged as an admin**
 
-![[Pasted image 20220827132812.png]]
+![image](https://user-images.githubusercontent.com/30558331/187045443-89ba6b17-5abc-4d55-adc3-0d7411cfe101.png)
+
 
 Using Guidra to analyze the code, we can see some interesting points in the login() function:
 
@@ -27,7 +28,8 @@ We are reading from the standard input a size of 0xa0 (160) and store it in our 
 
 How can we do that? Well, we need to input a string of length 31, why 31? because the smallest allowed  allocation for malloc is 32 bytes, there are **16 bytes we can use without any problem but other 16 bytes free**, after those bytes you will find the first block of memory that the user's id have. fgets appends the null terminator (remember, its value is 0), **we need to insert that null terminator to the first block of memory from from the user's id.**
 
-![[Pasted image 20220827141821.png|2000]]
+![image](https://user-images.githubusercontent.com/30558331/187045464-0c9d3ce8-8a3c-46c2-ba82-fb78e869bbea.png)
+
 
 As we can see above, if we enter a string of 31 length, with the null terminator appended, we will invade the next block of memory, which belongs to user's id, changing the value from 1 to 0 and gaining admin access.
 
